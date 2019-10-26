@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Wave</title>
+	<style>
+		html, body
+		{
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+		#setting
+		{
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 10px;
+			background: #0077FF;
+			opacity: 0.2;
+			border-radius: 5px;
+			text-align: center;
+			color: white;
+		}
+		#setting:hover
+		{
+			opacity: 0.8;
+		}
+		#setting > input
+		{
+			width: 30px;
+			margin: 3px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="cnvs"></canvas>
+	<div id="setting">
+		Altitude: <br>
+		<button onclick="changeValue('altitude',-1)">-</button><input id="alt" type="text" value="2" disabled><button onclick="changeValue('altitude',1)">+</button><br>
+		Frequency: <br>
+		<button onclick="changeValue('frequency',-0.01)">-</button><input id="fre" type="text" value="3" disabled><button onclick="changeValue('frequency',0.01)">+</button><br>
+		Speed: <br>
+		<button onclick="changeValue('speed',-0.1)">-</button><input id="spe" type="text" value="20" disabled><button onclick="changeValue('speed',0.1)">+</button>
+	
+	</div>
+	
+	<script>
+	
+	var canvas = document.getElementById("cnvs");
+	var c = canvas.getContext("2d");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	
+	var creating = 1;
+	var wob = 0;
+	var radians = 0;
+	var waves = 0;
+	
+	var altitude = 2;
+	var frequency = 0.03;
+	var speed = 2.5;
+	
+	function bubble()
+	{
+		this.x = innerWidth/2;
+		this.y = innerHeight/2 + wob;
+		this.size = 0;
+		this.opacity = 1;
+		
+		this.update = function()
+		{
+			this.size += speed;
+			this.opacity -= 0.0003;
+			this.draw();
+		}
+		
+		this.draw = function()
+		{
+			c.beginPath();
+			c.arc(this.x,this.y,this.size,0,Math.PI*2);
+			c.strokeStyle = "rgba(0,150,255,"+this.opacity+")";
+			c.stroke();
+		}
+	}
+	
+	var bubbles = [];
+	
+	function animate()
+	{
+		requestAnimationFrame(animate);
+		c.clearRect(0,0,canvas.width,canvas.height);		
+		if(creating == 1)
+		{
+			bubbles[waves] = new bubble();
+			waves++;
+			if(waves > 1000){waves = 0;}
+		}
+		for(var i=0;i<bubbles.length;i++)
+		{
+			bubbles[i].update();
+		}
+		
+		wob += Math.cos(radians)*altitude;
+		radians += Math.PI*frequency;
+		
+	}
+	
+	function changeValue(y,x)
+	{
+		window[y] += x;
+		if(altitude < 1){altitude = 1;}
+		if(altitude > 10){altitude = 10;}
+		if(frequency > 0.1){frequency = 0.1;}
+		if(frequency < 0.01){frequency = 0.01;}
+		if(speed < 1.5){speed = 1.5;}
+		if(speed > 3.5){speed = 3.5;}
+		document.getElementById("alt").value = altitude;
+		document.getElementById("fre").value = parseInt(frequency*100);
+		document.getElementById("spe").value = parseInt(speed*10)-5;
+	}
+	
+	animate();
+	
+	</script>
+	
+</body>
+</html>
